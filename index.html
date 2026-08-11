@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quibly — Let Quibly Decide</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f7fb;
+      color: #17181c;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px 7%;
+      background: white;
+      border-bottom: 1px solid #e8e8ed;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .logo span {
+      font-size: 24px;
+    }
+
+    .tagline {
+      color: #777;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 55px auto;
+      padding: 0 20px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 70px);
+      letter-spacing: -3px;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      font-size: 19px;
+      color: #666;
+    }
+
+    .judge-box {
+      background: white;
+      padding: 30px;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.07);
+    }
+
+    .sides {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .side {
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 18px;
+    }
+
+    .side h2 {
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 180px;
+      resize: vertical;
+      border: 0;
+      outline: none;
+      background: #f5f5f8;
+      border-radius: 14px;
+      padding: 15px;
+      font-size: 16px;
+      font-family: inherit;
+    }
+
+    .topic {
+      margin: 22px 0;
+    }
+
+    .topic input {
+      width: 100%;
+      padding: 16px;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 18px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #17181c;
+      color: white;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      opacity: 0.9;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: wait;
+      transform: none;
+    }
+
+    .result {
+      display: none;
+      margin-top: 30px;
+      padding: 28px;
+      border-radius: 20px;
+      background: #f0f1ff;
+      border: 1px solid #dfe1ff;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .verdict {
+      font-size: 34px;
+      font-weight: 800;
+      margin: 10px 0 20px;
+    }
+
+    .reasoning {
+      line-height: 1.7;
+      color: #444;
+      white-space: pre-wrap;
+    }
+
+    .score-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .score {
+      background: white;
+      padding: 18px;
+      border-radius: 15px;
+    }
+
+    .score strong {
+      font-size: 25px;
+      display: block;
+      margin-top: 5px;
+    }
+
+    footer {
+      text-align: center;
+      color: #888;
+      padding: 40px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 700px) {
+      .sides {
+        grid-template-columns: 1fr;
+      }
+
+      .judge-box {
+        padding: 18px;
+      }
+
+      .score-container {
+        grid-template-columns: 1fr;
+      }
+
+      .tagline {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">Quibly ⚖️</div>
+  <div class="tagline">Let Quibly decide.</div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <h1>Got an argument?</h1>
+    <p>Give both sides to Quibly and let the AI judge.</p>
+  </section>
+
+  <section class="judge-box">
+
+    <div class="topic">
+      <input
+        id="topic"
+        type="text"
+        placeholder="What are you arguing about?"
+      >
+    </div>
+
+    <div class="sides">
+
+      <div class="side">
+        <h2>🅰️ Side A</h2>
+        <textarea
+          id="sideA"
+          placeholder="Write Side A's argument..."
+        ></textarea>
+      </div>
+
+      <div class="side">
+        <h2>🅱️ Side B</h2>
+        <textarea
+          id="sideB"
+          placeholder="Write Side B's argument..."
+        ></textarea>
+      </div>
+
+    </div>
+
+    <br>
+
+    <button id="judgeButton" onclick="judgeArgument()">
+      ⚡ ASK QUIBLY
+    </button>
+
+    <div id="result" class="result">
+
+      <div>⚖️ QUIBLY'S VERDICT</div>
+
+      <div id="verdict" class="verdict">
+        —
+      </div>
+
+      <div id="reasoning" class="reasoning">
+      </div>
+
+      <div class="score-container">
+
+        <div class="score">
+          Side A
+          <strong id="scoreA">—</strong>
+        </div>
+
+        <div class="score">
+          Side B
+          <strong id="scoreB">—</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  Quibly © 2026 · AI-assisted opinions, not absolute truth.
+</footer>
+
+<script>
+
+async function judgeArgument() {
+
+  const topic = document.getElementById("topic").value.trim();
+  const sideA = document.getElementById("sideA").value.trim();
+  const sideB = document.getElementById("sideB").value.trim();
+
+  const button = document.getElementById("judgeButton");
+
+  if (!topic || !sideA || !sideB) {
+    alert("Please fill in the topic and both sides.");
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "⚖️ QUIBLY IS THINKING...";
+
+  try {
+
+    /*
+      IMPORTANT:
+
+      Do NOT put your Gemini API key here.
+
+      Your website should send this request to YOUR backend:
+
+      /api/judge
+
+      Your backend then talks to Gemini.
+    */
+
+    const response = await fetch("/api/judge", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        topic: topic,
+        sideA: sideA,
+        sideB: sideB
+      })
+
+    });
+
+    if (!response.ok) {
+      throw new Error("Server error");
+    }
+
+    const data = await response.json();
+
+    document.getElementById("verdict").textContent =
+      data.verdict;
+
+    document.getElementById("reasoning").textContent =
+      data.reasoning;
+
+    document.getElementById("scoreA").textContent =
+      data.scoreA + "/10";
+
+    document.getElementById("scoreB").textContent =
+      data.scoreB + "/10";
+
+    document.getElementById("result").classList.add("show");
+
+  } catch (error) {
+
+    alert(
+      "Quibly couldn't reach the AI right now. Make sure the backend is connected."
+    );
+
+    console.error(error);
+
+  } finally {
+
+    button.disabled = false;
+    button.textContent = "⚡ ASK QUIBLY";
+
+  }
+}
+
+</script>
+
+</body>
+</html>
